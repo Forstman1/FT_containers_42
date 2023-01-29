@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 18:22:56 by sahafid           #+#    #+#             */
-/*   Updated: 2023/01/27 23:49:52 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/01/29 17:12:25 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,11 @@ int main()
     // ft::vector<test> vec;
     // vec.push_back(var);
     ft::vector<int> ob;
+    ft::vector<int> ob1;
+
     std::vector<int> vect;
+    std::vector<int> vect1;
+
 
 
 
@@ -73,14 +77,19 @@ int main()
     std::cout << ob.data() << std::endl;
     std::cout << vect.data() << std::endl;
 
+
     // std::cout << ob[2] << std::endl;
     // std::cout << vect << std::endl;
     ob.clear();
     vect.clear();
 
-    std::cout << vect.capacity() << std::endl;
+    // ob.swap(ob1);
     std::cout << ob.capacity() << std::endl;
+    std::cout << ob[0] << std::endl;
 
-    
+    ft::vector<int>::iterator it = ob.begin();
+    *it++;
+    std::cout << *it << std::endl;
     return 0;
 }
+

@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 18:23:59 by sahafid           #+#    #+#             */
-/*   Updated: 2023/01/27 23:49:06 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/01/29 21:20:53 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,27 @@
 #include <alloca.h>
 #include <memory>
 #include <exception>
+#include <iterator>
+
 
 namespace ft {
 
-    template <typename T, typename allocator_type = std::allocator<T> >
+    template <typename T, typename Alloc = std::allocator<T> >
     class vector {
         private:
 
+
+            typedef T value_type;
+            typedef Alloc allocator_type;
+            typedef size_t size_type;
+            
+            
+            typedef typename allocator_type::reference reference;
+            typedef typename allocator_type::const_reference const_reference;
+            typedef typename allocator_type::pointer pointer;
+            typedef typename allocator_type::const_pointer const_pointer;
+
+            
             T *array;
             size_t size_filled;
             size_t capacity_;
@@ -28,10 +42,79 @@ namespace ft {
             
         public:
 
+            class iterator  {
+                public:
+                    
+                    typedef value_type* PointerType; 
+                    typedef value_type& ReferenceType; 
 
+                    iterator(PointerType ptr) {
+                        Iter = ptr;                        
+                    }
+                    iterator() {
+                        Iter = NULL;                        
+                    }
+                    ~iterator(){}
+                    
+                    iterator operator=(const iterator &rhs)
+                    {
+                        Iter = rhs.Iter;
+                        return *this;
+                    }
+                    iterator& operator++() {
+                        Iter++;
+                        return *this;
+                    } 
+                    iterator operator++(int) {
+                        iterator tmp = *this;
+                        Iter++;
+                        return tmp;
+                    }
+                    iterator& operator--() {
+                        Iter--;
+                        return *this;
+                    } 
+                    iterator operator--(int) {
+                        iterator tmp = *this;
+                        Iter--;
+                        return tmp;
+                    }
+                    
+                    ReferenceType operator[](int index) {
+                        return (Iter[index]);
+                    } 
+                    value_type& operator*() {
+                        return *Iter;
+                    }
 
+                    PointerType operator->()
+                    {
+                        return Iter;
+                    }
 
-        
+                    bool operator==(const iterator &cmp) const 
+                    {
+                        return (Iter == cmp.Iter);
+                    }
+                    bool operator!=(const iterator &cmp) const 
+                    {
+                        return (Iter != cmp.Iter);
+                    }
+                    
+                    
+                private:
+                    PointerType Iter;
+            };
+            
+
+            struct iterator_traits {
+                typedef typename iterator::value_type value_type;
+                typedef typename iterator::difference_type difference_type;
+                typedef typename iterator::pointer pointer ;
+                typedef typename iterator::reference reference;
+                typedef typename iterator::iterator_category iterator_category;
+            };
+
             vector(){
                 this->array = NULL;
                 this->size_filled = 0;
@@ -172,10 +255,10 @@ namespace ft {
                 return (array[this->size() - 1]);
             }
 
-            T* data() {
+            value_type* data() {
                 return (array);
             }
-            const T* data() const 
+            const value_type* data() const 
             {
                 return (array);
             }
@@ -229,7 +312,75 @@ namespace ft {
 
             void    swap(vector &x)
             {
+                T *tmp = this->array;
+                size_t sizeofarray = this->size();
+                size_t capacityofarray = this->capacity();
                 
+                T *tmp2 = x.array;
+                size_t sizeofarray2 = x.size();
+                size_t capacityofarray2 = x.capacity();
+                
+                this->array = this->allocator.allocate(capacityofarray2);
+                x.array = x.allocator.allocate(capacityofarray);
+        
+                for (int i =0; i < sizeofarray2; i++)
+                {
+                    this->allocator.construct(&this->array[i], tmp2[i]);
+                    this->allocator.destroy(&tmp2[i]);
+                }
+                this->size_filled = sizeofarray2;
+                this->capacity_ = capacityofarray2;
+    
+                for (int i =0; i < sizeofarray; i++)
+                {
+                    x.allocator.construct(&x.array[i], tmp[i]);
+                    x.allocator.destroy(&tmp[i]);
+                }
+                x.size_filled = sizeofarray;
+                x.capacity_ = capacityofarray;
+                   
+            }
+
+            allocator_type get_allocator() const {
+                return (allocator);
+            }
+
+
+            
+
+
+            // Iterators member functions
+            iterator begin()
+            {
+                return (array);
+            }
+            iterator end()
+            {
+                return (array + this->size());
+            }
+            iterator rbegin()
+            {
+                return (end());
+            }
+            iterator rend()
+            {
+                return (begin());
+            }
+            const iterator cbegin() const
+            {
+                return (array);
+            }
+            const iterator cend() const
+            {
+                return (array + this->size());
+            }
+            const iterator crbegin() const
+            {
+                return (end());
+            }
+            const iterator crend() const
+            {
+                return (begin());
             }
     };
 }
