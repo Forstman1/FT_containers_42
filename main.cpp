@@ -6,12 +6,13 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 18:22:56 by sahafid           #+#    #+#             */
-/*   Updated: 2023/01/29 17:12:25 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/01/31 11:53:38 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <vector>
 #include <iostream>
+#include <algorithm>
 #include "vector.hpp"
 
 struct test {
@@ -24,6 +25,8 @@ struct test {
         return *this;
     }
 };
+
+
 
 int main()
 {
@@ -77,19 +80,41 @@ int main()
     std::cout << ob.data() << std::endl;
     std::cout << vect.data() << std::endl;
 
-
     // std::cout << ob[2] << std::endl;
     // std::cout << vect << std::endl;
     ob.clear();
     vect.clear();
 
-    // ob.swap(ob1);
-    std::cout << ob.capacity() << std::endl;
-    std::cout << ob[0] << std::endl;
+    vect.reserve(17);
+    ob.reserve(17);
+    
 
-    ft::vector<int>::iterator it = ob.begin();
-    *it++;
-    std::cout << *it << std::endl;
+    vect.push_back(10);
+    vect.push_back(15);
+
+    vect1.resize(10,3);
+
+    // ob.swap(ob1);
+    // std::cout << ob.capacity() << std::endl;
+    // std::cout << ob[0] << std::endl;
+
+    // *it++;
+    // std::cout << *it << std::endl;
+    
+    std::cout << vect.size() << " " << vect.capacity() << std::endl;
+
+    vect.assign(vect1.begin(), vect1.end());
+    
+    std::cout << vect.size() << " " << vect.capacity() << std::endl;
+    
+    ob.assign(100, 1);
+
+
+    
+    ob.check(vect);
+    
+
+    // std::cout << ob.size() << std::endl;
+
     return 0;
 }
-

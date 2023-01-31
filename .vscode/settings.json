@@ -62,6 +62,10 @@
         "tuple": "cpp",
         "type_traits": "cpp",
         "typeinfo": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "__tree": "cpp",
+        "deque": "cpp",
+        "map": "cpp",
+        "stack": "cpp"
     }
 }

@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 18:23:59 by sahafid           #+#    #+#             */
-/*   Updated: 2023/01/29 21:20:53 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/01/31 12:01:13 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,127 @@
 #include <alloca.h>
 #include <memory>
 #include <exception>
-#include <iterator>
+#include <type_traits>
+
 
 
 namespace ft {
+
+
+
+    
+    template<class Category,class T,class Distance = std::ptrdiff_t, class Pointer = T*,class Reference = T&>
+    struct iterator
+    {
+        typedef T         value_type;
+        typedef Distance  difference_type;
+        typedef Pointer   pointer;
+        typedef Reference reference;
+        typedef Category  iterator_category;
+    };
+    
+    template<class iterator>
+    struct iterator_traits {
+        typedef typename iterator::value_type value_type;
+        typedef typename iterator::difference_type difference_type;
+        typedef typename iterator::pointer pointer ;
+        typedef typename iterator::reference reference;
+        typedef typename iterator::iterator_category iterator_category;
+    };
+    
+    
+    template<class T>
+    struct iterator_traits<T*> {
+        typedef T value_type;
+        typedef T* pointer;
+        typedef T& reference;
+        typedef std::random_access_iterator_tag iterator_category;
+        typedef std::ptrdiff_t difference_type;
+    };
+    
+    template<class T>
+    struct iterator_traits<const T*> {
+        typedef T value_type;
+        typedef const T* pointer;
+        typedef const T& reference;
+        typedef std::random_access_iterator_tag iterator_category;
+        typedef std::ptrdiff_t difference_type;
+    };
+
+
+    template <typename T>
+    class random_acces_iterator : public iterator<std::random_access_iterator_tag, T>  {
+        public:
+
+            typedef typename iterator_traits<iterator<std::random_access_iterator_tag, T> >::value_type value_type;
+            typedef typename iterator_traits<iterator<std::random_access_iterator_tag, T> >::pointer pointer;
+            typedef typename iterator_traits<iterator<std::random_access_iterator_tag, T> >::reference reference;
+            typedef typename iterator_traits<iterator<std::random_access_iterator_tag, T> >::difference_type difference_type;
+
+
+            random_acces_iterator(pointer ptr) {
+                Iter = ptr;                        
+            }
+            random_acces_iterator() {
+                Iter = NULL;                        
+            }
+            ~random_acces_iterator(){
+            }
+            
+            random_acces_iterator &operator=(const random_acces_iterator &rhs)
+            {
+                if (this != &rhs)
+                    Iter = rhs.Iter;
+                return *this;
+            }
+            random_acces_iterator& operator++() {
+                Iter++;
+                return *this;
+            } 
+            random_acces_iterator operator++(int) {
+                random_acces_iterator tmp = *this;
+                Iter++;
+                return tmp;
+            }
+            random_acces_iterator& operator--() {
+                Iter--;
+                return *this;
+            } 
+            random_acces_iterator operator--(int) {
+                random_acces_iterator tmp = *this;
+                Iter--;
+                return tmp;
+            }
+            
+            reference operator[](int index) {
+                return (Iter[index]);
+            } 
+            value_type& operator*() {
+                return *Iter;
+            }
+            pointer operator->()
+            {
+                return Iter;
+            }
+            bool operator==(const random_acces_iterator &cmp) const 
+            {
+                return (Iter == cmp.Iter);
+            }
+            bool operator!=(const random_acces_iterator &cmp) const 
+            {
+                return (Iter != cmp.Iter);
+            }
+            
+            
+        private:
+            pointer Iter;
+    };
+
+}
+
+
+namespace ft {
+
 
     template <typename T, typename Alloc = std::allocator<T> >
     class vector {
@@ -25,6 +142,7 @@ namespace ft {
 
 
             typedef T value_type;
+            typedef const T const_value_type;
             typedef Alloc allocator_type;
             typedef size_t size_type;
             
@@ -34,93 +152,55 @@ namespace ft {
             typedef typename allocator_type::pointer pointer;
             typedef typename allocator_type::const_pointer const_pointer;
 
-            
+
             T *array;
             size_t size_filled;
             size_t capacity_;
             allocator_type allocator;
             
         public:
-
-            class iterator  {
-                public:
-                    
-                    typedef value_type* PointerType; 
-                    typedef value_type& ReferenceType; 
-
-                    iterator(PointerType ptr) {
-                        Iter = ptr;                        
-                    }
-                    iterator() {
-                        Iter = NULL;                        
-                    }
-                    ~iterator(){}
-                    
-                    iterator operator=(const iterator &rhs)
-                    {
-                        Iter = rhs.Iter;
-                        return *this;
-                    }
-                    iterator& operator++() {
-                        Iter++;
-                        return *this;
-                    } 
-                    iterator operator++(int) {
-                        iterator tmp = *this;
-                        Iter++;
-                        return tmp;
-                    }
-                    iterator& operator--() {
-                        Iter--;
-                        return *this;
-                    } 
-                    iterator operator--(int) {
-                        iterator tmp = *this;
-                        Iter--;
-                        return tmp;
-                    }
-                    
-                    ReferenceType operator[](int index) {
-                        return (Iter[index]);
-                    } 
-                    value_type& operator*() {
-                        return *Iter;
-                    }
-
-                    PointerType operator->()
-                    {
-                        return Iter;
-                    }
-
-                    bool operator==(const iterator &cmp) const 
-                    {
-                        return (Iter == cmp.Iter);
-                    }
-                    bool operator!=(const iterator &cmp) const 
-                    {
-                        return (Iter != cmp.Iter);
-                    }
-                    
-                    
-                private:
-                    PointerType Iter;
-            };
+            typedef ft::random_acces_iterator<value_type> iterator;
+            typedef ft::random_acces_iterator<const_value_type> const_iterator;
             
 
-            struct iterator_traits {
-                typedef typename iterator::value_type value_type;
-                typedef typename iterator::difference_type difference_type;
-                typedef typename iterator::pointer pointer ;
-                typedef typename iterator::reference reference;
-                typedef typename iterator::iterator_category iterator_category;
-            };
+
+            void    check(std::vector<T> &second)
+            {
+                if (size() != second.size())
+                {
+                    std::cout << "not equal size " << size() << " " << second.size();
+                    return ;
+                }
+                if (capacity() != second.capacity())
+                {
+                    std::cout << "not equal capacity "<< capacity() << " " << second.capacity();
+                    return ;
+                }
+                for (int i =0 ; i < second.size(); i++)
+                {
+                    if (array[i] != second[i])
+                    {
+                        std::cout << "not equal value\n";
+                        return ;
+                    }
+                }
+                std::cout << "equal dakshi\n";
+            }
+            
+            
+            
+
+            
+
 
             vector(){
                 this->array = NULL;
                 this->size_filled = 0;
                 this->capacity_ = 0;
             }
-            ~vector() {}
+            ~vector() {
+                allocator.deallocate(array, capacity());
+            }
 
             vector& operator= (const vector& x)
             {
@@ -143,12 +223,12 @@ namespace ft {
 
 
             
-            size_t    size() {
+            size_type    size() {
                 return (this->size_filled);
             }
 
 
-            size_t    capacity() {
+            size_type    capacity() {
                 return (this->capacity_);
             }
 
@@ -162,7 +242,7 @@ namespace ft {
 
 
             
-            void    resize(size_t n, T val = T()) {
+            void    resize(size_type n, value_type val = value_type()) {
                 
                 if (n < this->size())
                 {
@@ -186,7 +266,7 @@ namespace ft {
                             capacity_++;
                             this->size_filled++;    
                             this->array = this->allocator.allocate(this->capacity_);
-                            for (int i = 0; i < this->size_filled-1; i++)
+                            for (int i = 0; i < this->size_filled; i++)
                             {
                                 this->allocator.construct(&this->array[i], tmp[i]);
                                 this->allocator.destroy(&tmp[i]);
@@ -200,16 +280,20 @@ namespace ft {
 
 
 
-            void    reserve(size_t n) {
-                
-                if (n > this->capacity())
+            void    reserve(size_type n) {
+                if (this->capacity() == 0)
+                {
+                    this->array = this->allocator.allocate(n);
+                    capacity_ += n; 
+                }
+                else if (n > this->capacity())
                 {
                     for (int j = this->capacity(); j < n; j++)
                     {
                         T *tmp = this->array;
                         capacity_++; 
                         this->array = this->allocator.allocate(this->capacity_);
-                        for (int i = 0; i < this->size_filled-1; i++)
+                        for (int i = 0; i < this->size_filled; i++)
                         {
                             this->allocator.construct(&this->array[i], tmp[i]);
                             this->allocator.destroy(&tmp[i]);
@@ -219,39 +303,40 @@ namespace ft {
                 }
             }
             
-            T& operator[] (size_t n)
+            value_type& operator[] (size_type n)
             {
                 return (array[n]);
             }
-            const T& operator[] (size_t n) const
+            const value_type& operator[] (size_type n) const
             {
                 return (array[n]);
             }
-            T& at(size_t n) {
+            
+            value_type& at(size_type n) {
             
                 if (n >= this->size())
                     throw std::out_of_range("vector");
                 return (array[n]);
             }
             
-            const T& at(size_t n) const
+            const value_type& at(size_type n) const
             {
                 if (n >= this->size())
                     throw std::out_of_range("vector");
                 return (array[n]);
             }
 
-            T& front() {
+            value_type& front() {
                 return (array[0]);
             }
-            const T& front() const {
+            const value_type& front() const {
                 return (array[0]);
             }
             
-             T& back() {
+            value_type& back() {
                 return (array[this->size() - 1]);
             }
-            const T& back() const {
+            const value_type& back() const {
                 return (array[this->size() - 1]);
             }
 
@@ -263,7 +348,7 @@ namespace ft {
                 return (array);
             }
             
-            void    push_back(const T &value) {
+            void    push_back(const value_type &value) {
                 
                 if (capacity_ == 0)
                 {
@@ -344,9 +429,64 @@ namespace ft {
             allocator_type get_allocator() const {
                 return (allocator);
             }
-
+            
+            template <class InputIterator >
+            void assign (InputIterator first, InputIterator last, typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = NULL)
+            {
+                int n = first - last;
+                if (n < 0)
+                    throw std::length_error("vector");
+                if (n > capacity())
+                    reserve(n);
+                for (int i = 0 ; i < n; i++)
+                {
+                    
+                }
+                
+            }
+            
 
             
+            void    assign(size_type n, const value_type& val)
+            {
+                if (n <= capacity())
+                {
+                    if (size() > n)
+                    {
+                        for (int i = 0 ; i < n; i++)
+                        {
+                            T *tmp = &array[i]; 
+                            allocator.construct(&array[i], val);
+                            allocator.destroy(tmp);
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0 ; i < n; i++)
+                        {
+                            T *tmp = &array[i]; 
+                            allocator.construct(&array[i], val);
+                            allocator.destroy(tmp);
+                        }
+                        for (int i = n ; i < size(); i++)
+                            allocator.destroy(&array[i]);
+                        size_filled = n;
+                    }
+                }
+                else
+                {
+                    resize(n, val);
+                    for (int i = 0 ; i < n; i++)
+                    {
+                        T *tmp = &array[i];
+                        allocator.construct(&array[i], val);
+                        allocator.destroy(tmp);
+                    }
+                }
+            }
+
+
+
 
 
             // Iterators member functions
@@ -366,21 +506,24 @@ namespace ft {
             {
                 return (begin());
             }
-            const iterator cbegin() const
+            const_iterator cbegin() const
             {
                 return (array);
             }
-            const iterator cend() const
+            const_iterator cend() const
             {
                 return (array + this->size());
             }
-            const iterator crbegin() const
+            const_iterator crbegin() const
             {
                 return (end());
             }
-            const iterator crend() const
+            const_iterator crend() const
             {
                 return (begin());
             }
     };
+   
 }
+
+
