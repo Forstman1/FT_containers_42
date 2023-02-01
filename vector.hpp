@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 18:23:59 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/01 14:00:13 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/01 19:53:49 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,7 +202,7 @@ namespace ft {
                 {
                     if (array[i] != second[i])
                     {
-                        std::cout << array[i] << " " << second[i] << std::endl;
+                        std::cout << array[i] << " " << second[i] << " " << i << std::endl;
                         std::cout << "not equal value\n";
                         return ;
                     }
@@ -315,18 +315,16 @@ namespace ft {
                 }
                 else if (n > this->capacity())
                 {
-                    for (int j = this->capacity(); j < n; j++)
+                    T *tmp = this->array;
+                    int oldcapacity = capacity();
+                    this->array = this->allocator.allocate(n);
+                    capacity_ = n;
+                    for (int i =0; i < this->size(); i++)
                     {
-                        T *tmp = this->array;
-                        capacity_++; 
-                        this->array = this->allocator.allocate(this->capacity_);
-                        for (int i = 0; i < this->size_filled; i++)
-                        {
-                            this->allocator.construct(&this->array[i], tmp[i]);
-                            this->allocator.destroy(&tmp[i]);
-                        }
-                        this->allocator.deallocate(tmp, capacity() -1);
+                        this->allocator.construct(&this->array[i], tmp[i]);
+                        this->allocator.destroy(&tmp[i]);
                     }
+                    this->allocator.deallocate(tmp, oldcapacity);
                 }
             }
             
@@ -418,7 +416,9 @@ namespace ft {
             void    clear()
             {
                 for (int i = 0; i < this->size_filled; i++)
+                {
                     this->allocator.destroy(&array[i]);
+                }
                 size_filled = 0;
             }
 
@@ -449,8 +449,7 @@ namespace ft {
                     x.allocator.destroy(&tmp[i]);
                 }
                 x.size_filled = sizeofarray;
-                x.capacity_ = capacityofarray;
-                   
+                x.capacity_ = capacityofarray;  
             }
 
             allocator_type get_allocator() const {
@@ -519,7 +518,7 @@ namespace ft {
 
             iterator insert (iterator position, const value_type& val)
             {
-                iterator it;
+                iterator it = end();
                 if (size() == capacity())
                 {
                     reserve(capacity() + 1);
@@ -527,22 +526,29 @@ namespace ft {
                     T* tmp2;
                     for (int i = 0; i < size(); i++)
                     {
+                        int index = 0;
                         it = begin() + i;
                         if (position == it)
                         {
-                           tmp = array + i + 1;
-                           allocator.construct(array + i + 1, val);
-                           i = 0;
-                           for (int j = i + 2; j < size()+1; j++)
-                           {
+                            tmp = array;
+                            value_type tmp3 = array[i];
+                            allocator.construct(&array[i], val);
+                            i++;
+                            tmp2 = &array[i];
+                            allocator.construct(&array[i], tmp3);
+                            allocator.destroy(tmp2);
+                            i++;
+                            for (int j = i + 1; j < size()+1; j++)
+                            {
                                 tmp2 = &array[j];
                                 allocator.construct(&array[j], tmp[i]);
                                 allocator.destroy(tmp2);
+                                index++;
                                 i++;
-                           }
-                           it = begin() + i;
-                           size_filled++;
-                           return (it);
+                            }
+                            it = begin() + i;
+                            size_filled++;
+                            return (it);
                         }
                     }
                 }
@@ -552,31 +558,46 @@ namespace ft {
                     T* tmp2;
                     for (int i = 0; i < capacity(); i++)
                     {
+                        int index = 0;
                         it = begin() + i;
                         if (position == it)
                         {
-                           tmp = array + i + 1;
-                           allocator.construct(array + i + 1, val);
-                           i = 0;
-                           for (int j = i + 2; j < size()+1; j++)
-                           {
+                            tmp = array;
+                            value_type tmp3 = array[i];
+                            allocator.construct(&array[i], val);
+                            i++;
+                            tmp2 = &array[i];
+                            allocator.construct(&array[i], tmp3);
+                            allocator.destroy(tmp2);
+                            i++;
+                            for (int j = i + 1; j < size()+1; j++)
+                            {
                                 tmp2 = &array[j];
                                 allocator.construct(&array[j], tmp[i]);
                                 allocator.destroy(tmp2);
+                                index++;
                                 i++;
-                           }
-                           it = begin() + i;
-                           size_filled++;
-                           return (it);
+                            }
+                            it = begin() + i;
+                            size_filled++;
+                            return (it);
                         }
                     }
                 }
                 return (it);
             }
-            
+
             void insert (iterator position, size_type n, const value_type& val)
             {
-                
+                iterator it;
+                if (n <= capacity() - size())
+                {
+
+                }
+                else
+                {
+                    
+                }
             }
             
             template <class InputIterator>    
@@ -584,6 +605,62 @@ namespace ft {
             {
                 
             }
+
+
+            iterator erase (iterator position)
+            {
+                iterator it;
+                T* tmp;
+                T* tmp2;
+                
+                for (int i = 0; i < size(); i++)
+                {
+                    it = begin() + i;
+                    if (position == it)
+                    {
+                       tmp = array;
+                       for (int j = i; j < size(); j++)
+                       {
+                            tmp2 = &array[j];
+                            allocator.construct(&array[j], tmp[i + 1]);
+                            allocator.destroy(tmp2);
+                            i++;
+                       }
+                       it = begin() + i;
+                       size_filled--;
+                       return (it);
+                    }
+                }
+                return it;
+            }
+            
+            iterator erase (iterator first, iterator last)
+            {
+                iterator iter = last;
+                int len = last - first;
+                T* tmp;
+                T* tmp2;
+                for (int i = 0; i < size(); i++)
+                {
+                    iter = begin() + i;
+                    if (iter == first)
+                    {
+                        std::cout << "ana hna " << *first << std::endl;
+                        tmp = array;
+                        for (int j = i; j + len < size() && i + len < size(); j++)
+                        {
+                            tmp2 = &array[j];
+                            allocator.construct(&array[j], tmp[i + len]);
+                            allocator.destroy(tmp2);
+                            i++;
+                        }
+                        size_filled -= len;
+                        break ;
+                    }
+                }
+                return (iter);
+            }
+            
 
 
             // Iterators member functions

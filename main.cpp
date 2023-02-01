@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 18:22:56 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/01 14:00:35 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/01 19:54:45 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,8 @@ int main()
     
     // std::cout << ob.size() << std::endl;
     // std::cout << vect.size() << std::endl;
-    
+
+
     // std::cout << ob.capacity() << std::endl;
     // std::cout << vect.capacity() << std::endl;
 
@@ -87,24 +88,39 @@ int main()
 
     vect.reserve(17);
     ob.reserve(17);
-    
-
-    vect.push_back(10);
-    vect.push_back(15);
-
-    ob.push_back(10);
-    ob.push_back(15);
 
     
-    vect1.resize(10,3);
-    ob1.resize(10,3);
+     
+    ob.resize(10, 10);
+    vect.resize(10, 10);
     
-    
-    
-    vect.insert(vect.begin() + 2, 8);
-    std::cout << vect.size() << " " << vect.capacity() << std::endl;
-    ob.insert(ob.begin() + 2, 8);
+    // vect.push_back(10);
+    // vect.push_back(15);
 
+    // ob.push_back(10);
+    // ob.push_back(15);
+
+    
+    // vect1.resize(10,3);
+    // ob1.resize(10,3);
+    vect[2] = 5;
+    ob[2] = 5;
+    vect[3] = 5;
+    ob[3] = 5;
+    
+    // vect.insert(vect.begin() + 2, 8);
+    vect.erase(vect.begin() + 2);
+    std::cout << vect.size() << std::endl;
+    
+    
+    ob.erase(ob.begin() + 2);
+    std::cout << ob.size() << std::endl;
+    
+
+    // std::cout << vect.size() << " " << vect.capacity() << std::endl;
+    // ob.insert(ob.begin() + 2, 8);
+    
+    // std::cout << ob[4] << std::endl;
 
     // ft::vector<int>::iterator iter = ob.begin() + 2;
     // std::cout << *iter << " " << ob.size() << std::endl;  
