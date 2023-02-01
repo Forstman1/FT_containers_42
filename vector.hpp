@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 18:23:59 by sahafid           #+#    #+#             */
-/*   Updated: 2023/01/31 12:01:13 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/01 14:00:13 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,29 @@ namespace ft {
                 return (Iter != cmp.Iter);
             }
             
+            int operator-(const random_acces_iterator &cmp) 
+            {
+                int res = Iter - cmp.Iter;
+                return (res);
+            }
+            int operator+(const random_acces_iterator &cmp) 
+            {
+                int res = Iter + cmp.Iter;
+                return (res);
+            }
             
+            random_acces_iterator operator-(int val) 
+            {
+                random_acces_iterator tmp = *this;
+                tmp.Iter -= val;
+                return tmp;
+            }
+            random_acces_iterator operator+(int val) 
+            {
+                random_acces_iterator tmp = *this;
+                tmp.Iter += val;
+                return tmp;
+            }
         private:
             pointer Iter;
     };
@@ -176,10 +198,11 @@ namespace ft {
                     std::cout << "not equal capacity "<< capacity() << " " << second.capacity();
                     return ;
                 }
-                for (int i =0 ; i < second.size(); i++)
+                for (int i =0 ; (i < second.size() || i < size()); i++)
                 {
                     if (array[i] != second[i])
                     {
+                        std::cout << array[i] << " " << second[i] << std::endl;
                         std::cout << "not equal value\n";
                         return ;
                     }
@@ -243,7 +266,11 @@ namespace ft {
 
             
             void    resize(size_type n, value_type val = value_type()) {
-                
+                if (this->capacity() == 0)
+                {
+                    this->array = this->allocator.allocate(n);
+                    capacity_ += n; 
+                }
                 if (n < this->size())
                 {
                     for (int i = this->size(); i > n; i--)
@@ -434,15 +461,19 @@ namespace ft {
             void assign (InputIterator first, InputIterator last, typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = NULL)
             {
                 int n = first - last;
+                n *= -1;
                 if (n < 0)
                     throw std::length_error("vector");
                 if (n > capacity())
                     reserve(n);
+                size_filled = 0;
                 for (int i = 0 ; i < n; i++)
                 {
-                    
+                    T *tmp = &array[i];
+                    this->allocator.construct(&this->array[i], first[i]);
+                    this->allocator.destroy(&tmp[i]);
+                    size_filled++;
                 }
-                
             }
             
 
@@ -486,7 +517,73 @@ namespace ft {
             }
 
 
-
+            iterator insert (iterator position, const value_type& val)
+            {
+                iterator it;
+                if (size() == capacity())
+                {
+                    reserve(capacity() + 1);
+                    T* tmp;
+                    T* tmp2;
+                    for (int i = 0; i < size(); i++)
+                    {
+                        it = begin() + i;
+                        if (position == it)
+                        {
+                           tmp = array + i + 1;
+                           allocator.construct(array + i + 1, val);
+                           i = 0;
+                           for (int j = i + 2; j < size()+1; j++)
+                           {
+                                tmp2 = &array[j];
+                                allocator.construct(&array[j], tmp[i]);
+                                allocator.destroy(tmp2);
+                                i++;
+                           }
+                           it = begin() + i;
+                           size_filled++;
+                           return (it);
+                        }
+                    }
+                }
+                else
+                {
+                    T* tmp;
+                    T* tmp2;
+                    for (int i = 0; i < capacity(); i++)
+                    {
+                        it = begin() + i;
+                        if (position == it)
+                        {
+                           tmp = array + i + 1;
+                           allocator.construct(array + i + 1, val);
+                           i = 0;
+                           for (int j = i + 2; j < size()+1; j++)
+                           {
+                                tmp2 = &array[j];
+                                allocator.construct(&array[j], tmp[i]);
+                                allocator.destroy(tmp2);
+                                i++;
+                           }
+                           it = begin() + i;
+                           size_filled++;
+                           return (it);
+                        }
+                    }
+                }
+                return (it);
+            }
+            
+            void insert (iterator position, size_type n, const value_type& val)
+            {
+                
+            }
+            
+            template <class InputIterator>    
+            void insert (iterator position, InputIterator first, InputIterator last)
+            {
+                
+            }
 
 
             // Iterators member functions
