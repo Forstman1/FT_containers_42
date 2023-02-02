@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 18:23:59 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/01 19:53:49 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/02 12:24:17 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -589,15 +589,32 @@ namespace ft {
 
             void insert (iterator position, size_type n, const value_type& val)
             {
-                iterator it;
-                if (n <= capacity() - size())
-                {
-
-                }
-                else
-                {
+                // iterator it;
+                // if (n <= capacity() - size())
+                // {
+                //     int len = n;
+                //     for (int i = 0; i < size(); i++)
+                //     {
+                //         it = begin() + i;
+                //         if (iter == position)
+                //         {
+                //             tmp = array;
+                //             for (int j = i; j + len < size() && i + len < size(); j++)
+                //             {
+                //                 tmp2 = &array[j];
+                //                 allocator.construct(&array[j], tmp[i + len]);
+                //                 allocator.destroy(tmp2);
+                //                 i++;
+                //             }
+                //             size_filled += len;
+                //             break ;
+                //         }
+                //     }
+                // }
+                // else
+                // {
                     
-                }
+                // }
             }
             
             template <class InputIterator>    
