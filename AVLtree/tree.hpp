@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/06 14:53:29 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/14 10:55:02 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/14 19:58:32 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,13 @@ namespace ft {
         Key key;
         Value value;
         
+        int     height;
         Node<Key, Value>    *parent;
         Node<Key, Value>    *left;
         Node<Key, Value>    *right;
     
       Node(const Key &key, const Value &value)
-          : key(key), value(value), left(NULL), right(NULL), parent(NULL){}
+          : key(key), value(value), left(NULL), right(NULL), parent(NULL), height(1) {}
     };
     
     
@@ -41,7 +42,52 @@ namespace ft {
         private:
             Node<Key, Value> *root;
     
+        protected:
+
         
+            void    Transplant(Node<Key, Value> *node, Node<Key, Value> *child)
+            {
+                if (node->parent == NULL)
+                    root = child;
+                else if (node == node->parent->left)
+                    node->parent->left = child;
+                else
+                    node->parent->right = child;
+                if (child != NULL)
+                    child->parent = node->parent;
+            }
+
+            
+            void    deleteNode(Node<Key, Value> *node)
+            {
+                if (node->left == NULL)
+                {
+                    Transplant(node, node->right);
+                    delete node;
+                }
+                else if (node->right == NULL)
+                {
+                    Transplant(node, node->left);
+                    delete node;
+                }
+                else
+                {
+                    Node<Key, Value> *smallestNode = node->right;
+                    while (smallestNode->left != NULL)
+                        smallestNode = smallestNode->left;
+                    if (smallestNode->parent != node)
+                    {
+                        Transplant(smallestNode, smallestNode->right);
+                        smallestNode->right = node->right;
+                        smallestNode->right->parent = smallestNode;
+                    }
+                    Transplant(node, smallestNode);
+                    smallestNode->left = node->left;
+                    smallestNode->left->parent = smallestNode;
+                    delete node;
+                }
+            }
+            
         public:
         
             tree() : root(NULL) {}
@@ -49,6 +95,38 @@ namespace ft {
             Node<Key, Value>    *getRoot(){
                 return root;
             }
+
+
+            void    deletion(Key key)
+            {
+                Node<Key, Value> *tmp = root;
+                
+                while (tmp != NULL)
+                {
+                    if (tmp->key > key && tmp->left != NULL)
+                        tmp = tmp->left;
+                    else if (tmp->key > key && tmp->left == NULL)
+                    {
+                        std::cout << "couldn't found the key\n";
+                        return ;
+                    }
+                    else if (tmp->key < key && tmp->right != NULL)
+                        tmp = tmp->right;
+                    else if (tmp->key < key && tmp->right == NULL)
+                    {
+                        std::cout << "couldn't found the key\n";
+                        return ;
+                    }
+                    else if (tmp->key == key)
+                    {
+                        deleteNode(tmp);
+                        CheckBalance(tmp);
+                        return ;
+                    }
+                }
+            }
+            
+            
             void    PrintTreePrivate(Node<Key, Value> * tmp, int space)
             {
                     if (!tmp)
@@ -62,13 +140,10 @@ namespace ft {
             }
 
             
-            void    leftRotation(Node<Key, Value> *node)
+            Node<Key, Value> *    leftRotation(Node<Key, Value> *node)
             {
                 Node<Key, Value> *newParent;
 
-                std::cout << "left rotation"<< std::endl;
-
-                
                 newParent = node->right;
                 
                 node->right = newParent->left;
@@ -88,14 +163,16 @@ namespace ft {
                 newParent->left = node;
                 node->parent = newParent;
                 
+                updateHeight(node); // update the height of node
+                updateHeight(newParent);
+                return newParent;
             }
 
-            void    rightRotation(Node<Key, Value> *node)
+            Node<Key, Value> *    rightRotation(Node<Key, Value> *node)
             {
                 Node<Key, Value> *newParent;
-                Node<Key, Value> *parent;
 
-                std::cout << "right rotation"<< std::endl;
+                // std::cout << "right rotation"<< std::endl;
                 newParent = node->left;
                 
                 node->left = newParent->right;
@@ -114,42 +191,45 @@ namespace ft {
                 
                 newParent->right = node;
                 node->parent = newParent;
-                
+                updateHeight(node); // update the height of node
+                updateHeight(newParent);
+                return newParent;
             }
 
 
+            // int height(Node<Key, Value> *node) 
+            // {
+            //     if (node == NULL) {
+            //         return 0;
+            //     }
+            
+            //     int leftHeight = height(node->left);
+            //     int rightHeight = height(node->right);
+            
+            //     return std::max(leftHeight, rightHeight) + 1;
+            // }
             int height(Node<Key, Value> *node) 
             {
                 if (node == NULL) {
                     return 0;
                 }
-            
-                int leftHeight = height(node->left);
-                int rightHeight = height(node->right);
-            
-                return std::max(leftHeight, rightHeight) + 1;
+                return node->height;
             }
-
             
             void    CheckBalance(Node<Key, Value> *parent)
             {
                 while (parent)
                 {
                     Node<Key, Value> *tmp = parent;
-                    int leftheight = 0;
-                    int rightheight = 0;
-
                     int balance = height(tmp->left) - height(tmp->right);
                     
                     // Left subtree is taller
                     if (balance > 1) {
                         int balanceLeft = height(tmp->left->left) - height(tmp->left->right);
-                
                         // Left-right rotation
                         if (balanceLeft < 0) {
                             leftRotation(tmp->left);
                         }
-                        
                         rightRotation(tmp);
                         // Right rotation
                         
@@ -166,33 +246,35 @@ namespace ft {
                         leftRotation(tmp);
                     }
                     else
+                    {
+                        tmp->height = std::max(height(tmp->left), height(tmp->right)) + 1;
                         parent = parent->parent;
+                    }
                 }
             }
-
-            void    deletion(Key key)
+            void printBT(const std::string& prefix, const Node<Key, Value> * node, bool isLeft)
             {
-                Node<Key, Value> *tmp = root;
-                
-                while (tmp != NULL)
+                if (node != nullptr)
                 {
-                    if (tmp->key > key && tmp->left != NULL)
-                        tmp = tmp->left;
-                    else if (tmp->key > key && tmp->left == NULL)
-                    {
-
-                        return ;
-                    }
-                    else if (tmp->key < key && tmp->right != NULL)
-                        tmp = tmp->right;
-                    else if (tmp->key < key && tmp->right == NULL)
-                    {
- 
-                        return ;
-                    }
+                    std::cout << prefix;
+                    std::cout << (isLeft ? "|--" : "L--");
+                    // print the value of the node
+                    std::cout << node->key << std::endl;
+                    // enter the next tree level - left and right branch
+                    printBT(prefix + (isLeft ? "|   " : "    "), node->right, true);
+                    printBT(prefix + (isLeft ? "|   " : "    "), node->left, false);
                 }
             }
             
+            void printBT(const Node<Key, Value> * node)
+            {
+                printBT("", node, false);
+            }
+
+
+            void updateHeight(Node<Key, Value> *node) {
+                node->height = std::max(height(node->left), height(node->right)) + 1;
+            }
             void    insert(Key key, Value value) {
 
                 Node<Key, Value> *tmp = root;
@@ -210,7 +292,7 @@ namespace ft {
                         {
                             Node<Key, Value> *newNode = new Node<Key, Value>(key, value);
                             newNode->parent = tmp;
-                            tmp->left = newNode;
+                            tmp->left = newNode;  
                             CheckBalance(tmp);
                             return ;
                         }
@@ -221,11 +303,37 @@ namespace ft {
                             Node<Key, Value> *newNode = new Node<Key, Value>(key, value);
                             tmp->right = newNode;
                             newNode->parent = tmp;
-                            CheckBalance(tmp);        
+                            CheckBalance(tmp);
                             return ;
                         }
                     }
                 }
             }
-    };
+            void find(Key key)
+            {
+                Node<Key, Value> *tmp = root;
+                while (tmp != NULL)
+                    {
+                        if (tmp->key > key && tmp->left != NULL)
+                            tmp = tmp->left;
+                        else if (tmp->key > key && tmp->left == NULL)
+                        {
+                            std::cout << "key couldn't be found\n";
+                            return ;
+                        }
+                        else if (tmp->key < key && tmp->right != NULL)
+                            tmp = tmp->right;
+                        else if (tmp->key < key && tmp->right == NULL)
+                        {
+                            std::cout << "key couldn't be found\n";
+                            return ;
+                        }
+                        else if (tmp->key == key)
+                        {
+                            std::cout << "key found " << key << std::endl;
+                            return ;
+                        }
+                    }
+                }
+            };
 }
