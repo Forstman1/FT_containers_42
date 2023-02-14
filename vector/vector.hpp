@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 18:23:59 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/02 12:24:17 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/07 11:36:40 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,18 +124,47 @@ namespace ft {
             {
                 return (Iter != cmp.Iter);
             }
+
+
             
-            int operator-(const random_acces_iterator &cmp) 
+            bool operator>=(const random_acces_iterator &cmp) const 
             {
-                int res = Iter - cmp.Iter;
+                return (Iter >= cmp.Iter);
+            }
+            bool operator<=(const random_acces_iterator &cmp) const 
+            {
+                return (Iter <= cmp.Iter);
+            }
+            bool operator>(const random_acces_iterator &cmp) const 
+            {
+                return (Iter > cmp.Iter);
+            }
+            bool operator<(const random_acces_iterator &cmp) const 
+            {
+                return (Iter < cmp.Iter);
+            }
+
+            
+            difference_type operator-(const random_acces_iterator &cmp) 
+            {
+                difference_type res = Iter - cmp.Iter;
                 return (res);
             }
-            int operator+(const random_acces_iterator &cmp) 
+            difference_type operator+(const random_acces_iterator &cmp) 
             {
-                int res = Iter + cmp.Iter;
+                difference_type res = Iter + cmp.Iter;
                 return (res);
             }
-            
+
+
+            random_acces_iterator& operator+=(int val) 
+            {
+                // random_acces_iterator tmp = *this;
+                Iter += val;
+                return *this;
+            }
+
+
             random_acces_iterator operator-(int val) 
             {
                 random_acces_iterator tmp = *this;
@@ -236,7 +265,7 @@ namespace ft {
                 this->capacity_ = x.capacity();
                 this->size_filled = x.size();
                 
-                this->allocator.allocate(this->capacity);
+                this->allocator.allocate(this->capacity());
                 
                 for (int i = 0; i < x.size(); i++)
                     this->allocator.construct(&this->array[i], x.array[i]);
@@ -246,17 +275,17 @@ namespace ft {
 
 
             
-            size_type    size() {
+            size_type    size() const{
                 return (this->size_filled);
             }
 
 
-            size_type    capacity() {
+            size_type    capacity() const {
                 return (this->capacity_);
             }
 
 
-            bool    empty() {
+            bool    empty()  const{
 
                 if (size_filled != 0)
                     return (1);
@@ -662,7 +691,6 @@ namespace ft {
                     iter = begin() + i;
                     if (iter == first)
                     {
-                        std::cout << "ana hna " << *first << std::endl;
                         tmp = array;
                         for (int j = i; j + len < size() && i + len < size(); j++)
                         {
