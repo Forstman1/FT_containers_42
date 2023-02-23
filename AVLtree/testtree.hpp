@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tree.hpp                                           :+:      :+:    :+:   */
+/*   testtree.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/06 14:53:29 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/23 19:56:05 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/23 20:00:25 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,23 +16,23 @@
 #include <memory.h>
 #include <algorithm>
 #include <alloca.h>
+#include <map>
 
 
 namespace ft {
 
     
-    template<typename Key, typename Value>
+    template<typename value_type>
     struct Node {
-        Key key;
-        Value value;
+        value_type data;
         
         int     height;
         Node<Key, Value>    *parent;
         Node<Key, Value>    *left;
         Node<Key, Value>    *right;
     
-      Node(const Key &key, const Value &value)
-          : key(key), value(value), left(NULL), right(NULL), parent(NULL), height(1) {}
+      Node(value_type mapped)
+          : data(mapped), left(NULL), right(NULL), parent(NULL), height(1) {}
     };
     
     
@@ -40,8 +40,10 @@ namespace ft {
     template<typename Key, typename Value, class Allocator = std::allocator<std::pair <const Key, Value> > >
     class tree {
         private:
-            Node<Key, Value> *root;
+            Node<value_type> *root;
             size_t size;
+            
+            typedef 
         protected:
 
         

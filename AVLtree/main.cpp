@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/06 18:07:44 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/14 20:09:08 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/23 17:04:09 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,18 +44,32 @@ int main()
     // x.insert(15, 3);
 
 
-    // for (int i = 0; i < 10000000; i++)
-    //     test.insert(std::pair<int,int>(i, 3));
-    // test.find(135729);
-    for (int i = 0; i <= 10; i++)
+    for (int i = 0; i <= 1000000; i++)
         x.insert(i, 3);
 
-    x.deletion(8);
-    x.deletion(7);
+
+    for (int i = 0; i < 1000000; i++)
+        x.deletion(i);
+
+
+    // std::cout << test.size() << "\n";
+    // std::cout << test.begin()->first << "\n";
+    // test.find(135729);
+    // for (int i = 0; i < 1000000; i++)
+    //     x.insert(i, 3);
+    // for (int i = 0; i < 600000; i++)
+    //     x.deletion(i);
+    // for (int i = 1000000; i < 1900000; i++)
+    //     x.insert(i, 3);
+    // x.printBT(x.getRoot());
+    // std::cout << x.getRoot()->key << std::endl;
+    // x.deletion(8);
+    // x.deletion(7);
     // x.printBT(x.getRoot());
     // x.deletion(15);
     // x.deletion(52);
-    // x.find(135729);
-    x.PrintTreePrivate(x.getRoot(), 0);
+    // x.find(90000);
+    // x.PrintTreePrivate(x.getRoot(), 0);
+
     return 0;
 }
