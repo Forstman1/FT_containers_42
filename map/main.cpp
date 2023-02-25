@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 20:27:38 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/23 20:28:32 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/25 12:52:29 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,5 +19,9 @@ int main()
 {
     ft::map<int, int> x;
 
-    
+    for (int i = 0; i < 10; i++)
+    {
+        x.insert(std::pair<int, int>(i, 3)); 
+    }
+    x.begin();
 }

@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 18:23:59 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/07 11:36:40 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/25 12:54:22 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,10 +204,11 @@ namespace ft {
             typedef typename allocator_type::const_pointer const_pointer;
 
 
-            T *array;
+            value_type *array;
             size_t size_filled;
             size_t capacity_;
             allocator_type allocator;
+            
             
         public:
             typedef ft::random_acces_iterator<value_type> iterator;
@@ -238,10 +239,6 @@ namespace ft {
                 }
                 std::cout << "equal dakshi\n";
             }
-            
-            
-            
-
             
 
 
