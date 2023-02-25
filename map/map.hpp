@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 15:40:58 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/25 12:58:30 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/25 18:45:34 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <map>
 #include <iostream>
 #include <algorithm>
-#include "../AVLtree/testtree.hpp"
+#include "tree.hpp"
 
 
 namespace ft {
@@ -69,17 +69,15 @@ namespace ft {
     
 
     
-    template <typename T, typename node>
-    class bidirectional_iterator : public iterator<std::bidirectional_iterator_tag, T>  {
-
-            
+    template <typename node, typename T>
+    class bidirectional_iterator : public iterator<std::bidirectional_iterator_tag, node>  {
 
         public:
-        
-            typedef typename iterator_traits<iterator<std::bidirectional_iterator_tag, T> >::value_type value_type;
-            typedef typename iterator_traits<iterator<std::bidirectional_iterator_tag, T> >::pointer pointer;
-            typedef typename iterator_traits<iterator<std::bidirectional_iterator_tag, T> >::reference reference;
-            typedef typename iterator_traits<iterator<std::bidirectional_iterator_tag, T> >::difference_type difference_type;
+
+            typedef typename iterator_traits<iterator<std::bidirectional_iterator_tag, node> >::value_type value_type;
+            typedef typename iterator_traits<iterator<std::bidirectional_iterator_tag, node> >::pointer pointer;
+            typedef typename iterator_traits<iterator<std::bidirectional_iterator_tag, node> >::reference reference;
+            typedef typename iterator_traits<iterator<std::bidirectional_iterator_tag, node> >::difference_type difference_type;
 
 
             bidirectional_iterator(pointer _ptr){
@@ -90,12 +88,140 @@ namespace ft {
             }
             ~bidirectional_iterator(){}
 
+
+
+            T*  operator->()
+            {
+                return ptr->data;
+            }
+
+            pointer operator*()
+            {
+                return ptr;
+            }
+
+            const bidirectional_iterator&  operator++()
+            {
+
+                if (ptr == NULL) {
+                    return *this;
+                }
             
+                // If the node has a right child, then the next node is the leftmost node in its right subtree
+                if (ptr->right != NULL) {
+                    node* current = ptr->right;
+                    while (current->left != NULL) {
+                        current = current->left;
+                    }
+                    ptr = current;
+                    return *this;
+                }
+            
+                // If the node does not have a right child, look for the first ancestor whose left child is also an ancestor of the given node
+                node* current = ptr;
+                node* parent = ptr->parent;
+                while (parent != NULL && current == parent->right) {
+                    current = parent;
+                    parent = parent->parent;
+                }
+                ptr = parent;
+                return *this;
+            }
+            
+            bidirectional_iterator  operator++(int)
+            {
+                node *tmp = ptr;
+
+
+                if (ptr == NULL) {
+                    return NULL;
+                }
+            
+                // If the node has a right child, then the next node is the leftmost node in its right subtree
+                if (ptr->right != NULL) {
+                    node* current = ptr->right;
+                    while (current->left != NULL) {
+                        current = current->left;
+                    }
+                    ptr = current;
+                    return tmp;
+                }
+            
+                // If the node does not have a right child, look for the first ancestor whose left child is also an ancestor of the given node
+                node* current = ptr;
+                node* parent = ptr->parent;
+                while (parent != NULL && current == parent->right) {
+                    current = parent;
+                    parent = parent->parent;
+                }
+                ptr = parent;
+                return tmp;
+            }
+            
+            
+            bidirectional_iterator&  operator--()
+            {
+
+                // If the node has a left child, then the next node is the rightmost node in its left subtree
+                if (ptr->left != NULL) {
+                    node* current = ptr->left;
+                    while (current->right != NULL) {
+                        current = current->right;
+                    }
+                    ptr = current;
+                    return *this;
+                }
+            
+                // If the node does not have a left child, look for the first ancestor whose right child is also an ancestor of the given node
+                node* current = ptr;
+                node* parent = ptr->parent;
+                while (parent != NULL && current == parent->left) {
+                    current = parent;
+                    parent = parent->parent;
+                }
+                ptr = parent;
+                return *this;
+            }
+
+            
+            bidirectional_iterator  operator--(int)
+            {
+                node *tmp = ptr;
+
+
+                if (ptr == NULL) {
+                    return NULL;
+                }
+            
+                // If the node has a left child, then the next node is the rightmost node in its left subtree
+                if (ptr->left != NULL) {
+                    node* current = ptr->left;
+                    while (current->right != NULL) {
+                        current = current->right;
+                    }
+                    ptr = current;
+                    return tmp;
+                }
+            
+                // If the node does not have a left child, look for the first ancestor whose right child is also an ancestor of the given node
+                node* current = ptr;
+                node* parent = ptr->parent;
+                while (parent != NULL && current == parent->left) {
+                    current = parent;
+                    parent = parent->parent;
+                }
+                ptr = parent;
+                return tmp;
+            }
+
+
+
         private:
-            node *ptr;
-            
+            pointer ptr;
     };  
 };
+
+
 
 namespace ft {
 
@@ -124,8 +250,8 @@ namespace ft {
 
             
             
-            typedef ft::bidirectional_iterator<value_type, ft::tree<key_type, value_type> > iterator;
-            typedef ft::bidirectional_iterator<const_value_type, ft::tree<key_type, value_type> > const_iterator;
+            typedef ft::bidirectional_iterator<ft::Node<value_type>, value_type> iterator;
+            typedef ft::bidirectional_iterator<ft::Node<const_value_type>, const_value_type> const_iterator;
 
 
             
@@ -133,7 +259,7 @@ namespace ft {
         protected:
         
             ft::tree<key_type, value_type> _tree;
-            
+
             allocator_type allocator;
             
             size_type size;
@@ -146,29 +272,44 @@ namespace ft {
 
             iterator begin()
             {
-                return _tree;
+                return _tree.begin();
             }
             
             iterator end()
             {
-                
+                return _tree.end();
             }
+            
             void    insert(const value_type& val)
             {
                 _tree.insert(val);
             }
+
             void    printBTT()
             {
                 _tree.printBT(_tree.getRoot());
             }
             
 
-            // template <class InputIterator>
-            // void    insert(InputIterator first, InputIterator last)
+            template <class InputIterator>
+            void    insert(InputIterator first, InputIterator last)
+            {
+                for (InputIterator it = first; it != last; it++)
+                {
+                    _tree.insert(*it);
+                }
+            }
+            
+            // void insert (const value_type& val)
+            // {
+            //     _tree.insert(val);
+            // }
+            
+            // iterator insert (iterator position, const value_type& val)
             // {
                 
             // }
-
+            
     };
 }
 

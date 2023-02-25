@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   testtree.hpp                                       :+:      :+:    :+:   */
+/*   tree.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/06 14:53:29 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/25 12:51:49 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/25 18:43:16 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,16 @@ namespace ft {
     
     template<typename value_type>
     struct Node {
-        value_type data;
+        value_type *data;
         
         int     height;
         Node<value_type>    *parent;
         Node<value_type>    *left;
         Node<value_type>    *right;
     
-      Node(const value_type mapped)
-          : data(mapped), left(NULL), right(NULL), parent(NULL), height(1) {}
+      Node()
+          : left(NULL), right(NULL), parent(NULL), height(1) {
+          }
     };
     
     
@@ -269,38 +270,57 @@ namespace ft {
             }
 
             
+            Node<value_type> * begin()
+            {
+                Node<value_type> *tmp = root;
+                while (tmp->left)
+                    tmp = tmp->left;
+                return tmp;
+            }
 
-
-            
+            Node<value_type> * end()
+            {
+                Node<value_type> *tmp = root;
+                while (tmp->right)
+                    tmp = tmp->right;
+                return tmp;
+            }
             void    insert(const value_type &data) {
 
                 Node<value_type> *tmp = root;
                 
 
                 if (tmp == NULL) {
-                    root = new Node<value_type>(data);
+                    // root = new Node<value_type>(data);
+                    Node<value_type> *newNode = new Node<value_type>;
+                    newNode->data = new value_type(data);
+                    root = newNode;
                     size++;
                 }
                 else
                 {   
                     while (tmp != NULL)
                     {
-                        if (tmp->data.first > data.first && tmp->left != NULL)
+                        if (tmp->data->first > data.first && tmp->left != NULL)
                             tmp = tmp->left;
-                        else if (tmp->data.first > data.first && tmp->left == NULL)
+                        else if (tmp->data->first > data.first && tmp->left == NULL)
                         {
-                            Node<value_type> *newNode = new Node<value_type>(data);
+                            // Node<value_type> *newNode = new Node<value_type>(data);
+                            Node<value_type> *newNode = new Node<value_type>;
+                            newNode->data = new value_type(data);
                             size++;
                             newNode->parent = tmp;
                             tmp->left = newNode;  
                             CheckBalance(tmp);
                             return ;
                         }
-                        else if (tmp->data.first < data.first && tmp->right != NULL)
+                        else if (tmp->data->first < data.first && tmp->right != NULL)
                             tmp = tmp->right;
-                        else if (tmp->data.first < data.first && tmp->right == NULL)
+                        else if (tmp->data->first < data.first && tmp->right == NULL)
                         {
-                            Node<value_type> *newNode = new Node<value_type>(data);
+                            Node<value_type> *newNode = new Node<value_type>;
+                            newNode->data = new value_type(data);
+                            
                             // Node<Key, Value> *newNode = allocator.allocate(sizeof(Node<Key, Value>*));
                             // allocator.construct(newNode);
                             tmp->right = newNode;
@@ -309,34 +329,38 @@ namespace ft {
                             CheckBalance(tmp);
                             return ;
                         }
+                        else
+                            return ;
                     }
                 }
-            }
-            void find(Key key)
+            }     
+            
+            int find(Key key)
             {
                 Node<value_type> *tmp = root;
                 while (tmp != NULL)
                     {
-                        if (tmp->data.first > key && tmp->left != NULL)
+                        if (tmp->data->first > key && tmp->left != NULL)
                             tmp = tmp->left;
-                        else if (tmp->data.first > key && tmp->left == NULL)
+                        else if (tmp->data->first > key && tmp->left == NULL)
                         {
                             std::cout << "key couldn't be found\n";
-                            return ;
+                            return 0;
                         }
-                        else if (tmp->data.first < key && tmp->right != NULL)
+                        else if (tmp->data->first < key && tmp->right != NULL)
                             tmp = tmp->right;
-                        else if (tmp->data.first < key && tmp->right == NULL)
+                        else if (tmp->data->first < key && tmp->right == NULL)
                         {
                             std::cout << "key couldn't be found\n";
-                            return ;
+                            return 0;
                         }
-                        else if (tmp->data.first == key)
+                        else if (tmp->data->first == key)
                         {
                             std::cout << "key found " << key << std::endl;
-                            return ;
+                            return 1;
                         }
                     }
+                return 0;
             }
         };
 }
