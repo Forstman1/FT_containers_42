@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 15:40:58 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/25 18:45:34 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/26 12:53:47 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,7 +214,18 @@ namespace ft {
                 return tmp;
             }
 
-
+            // bool operator==()
+            // {
+                
+            // }
+            bool operator==(const bidirectional_iterator &cmp) const 
+            {
+                return (ptr == cmp.ptr);
+            }
+            bool operator!=(const bidirectional_iterator &cmp) const 
+            {
+                return (ptr != cmp.ptr);
+            }
 
         private:
             pointer ptr;

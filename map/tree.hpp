@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/06 14:53:29 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/25 18:43:16 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/27 16:55:21 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ namespace ft {
     
     template<typename value_type>
     struct Node {
-        value_type *data;
+        value_type          *data;
         
-        int     height;
+        int                 height;
         Node<value_type>    *parent;
         Node<value_type>    *left;
         Node<value_type>    *right;
@@ -42,17 +42,20 @@ namespace ft {
     class tree {
         private:
             Node<value_type> *root;
-            size_t size;
+            Node<value_type> *end_node;
             Allocator allocator;
             
-            // typedef 
         protected:
 
         
             void    Transplant(Node<value_type> *node, Node<value_type> *child)
             {
                 if (node->parent == NULL)
+                {
                     root = child;
+                    end_node->left = root;
+                    root->parent = end_node;
+                }
                 else if (node == node->parent->left)
                     node->parent->left = child;
                 else
@@ -88,7 +91,10 @@ namespace ft {
             
         public:
         
-            tree() : root(NULL) , size(0){}
+            tree() : root(NULL) {
+                end_node = new Node<value_type>;
+                end_node->data = new value_type();
+            }
 
 
             
@@ -117,25 +123,10 @@ namespace ft {
                         deleteNode(tmp);
                         CheckBalance(tmp);
                         delete tmp;
-                        size--;
                         return ;
                     }
                 }
             }
-            
-            
-            void    PrintTreePrivate(Node<value_type> * tmp, int space)
-            {
-                    if (!tmp)
-                        return ; 
-                    space += 10;
-                    PrintTreePrivate(tmp->right, space);
-                    std::cout << std::endl;
-                    for(int i = 0; i < space; i++)   std::cout << " ";
-                    std::cout << "\033[31m "<< tmp->key << " \033[30m" <<  std::endl;
-                    PrintTreePrivate(tmp->left, space);
-            }
-
             
             Node<value_type> *    leftRotation(Node<value_type> *node)
             {
@@ -151,7 +142,11 @@ namespace ft {
                 newParent->parent = node->parent;
                 
                 if (node->parent == NULL)
+                {
                     root = newParent;
+                    end_node->left = root;
+                    root->parent = end_node;
+                }
                 else if (node == node->parent->left)
                     node->parent->left = newParent;
                 else 
@@ -169,7 +164,6 @@ namespace ft {
             {
                 Node<value_type> *newParent;
 
-                // std::cout << "right rotation"<< std::endl;
                 newParent = node->left;
                 
                 node->left = newParent->right;
@@ -180,7 +174,11 @@ namespace ft {
                 newParent->parent = node->parent;
                 
                 if (node->parent == NULL)
+                {
                     root = newParent;
+                    end_node->left = root;
+                    root->parent = end_node;
+                }
                 else if (node == node->parent->right)
                     node->parent->right = newParent;
                 else 
@@ -207,7 +205,7 @@ namespace ft {
             
             void    CheckBalance(Node<value_type> *parent)
             {
-                while (parent)
+                while (parent && parent != end_node)
                 {
                     Node<value_type> *tmp = parent;
                     int balance = height(tmp->left) - height(tmp->right);
@@ -245,12 +243,12 @@ namespace ft {
 
             void printBT(const std::string& prefix, const Node<value_type> * node, bool isLeft)
             {
-                if (node != nullptr)
+                if (node != NULL)
                 {
                     std::cout << prefix;
                     std::cout << (isLeft ? "|--" : "L--");
                     // print the value of the node
-                    std::cout << node->data.first << std::endl;
+                    std::cout << node->data->first << std::endl;
                     // enter the next tree level - left and right branch
                     printBT(prefix + (isLeft ? "|   " : "    "), node->right, true);
                     printBT(prefix + (isLeft ? "|   " : "    "), node->left, false);
@@ -280,22 +278,22 @@ namespace ft {
 
             Node<value_type> * end()
             {
-                Node<value_type> *tmp = root;
-                while (tmp->right)
-                    tmp = tmp->right;
-                return tmp;
+                return end_node;
             }
+
+
+            
             void    insert(const value_type &data) {
 
                 Node<value_type> *tmp = root;
                 
 
                 if (tmp == NULL) {
-                    // root = new Node<value_type>(data);
                     Node<value_type> *newNode = new Node<value_type>;
                     newNode->data = new value_type(data);
                     root = newNode;
-                    size++;
+                    end_node->left = root;
+                    root->parent = end_node;
                 }
                 else
                 {   
@@ -308,7 +306,6 @@ namespace ft {
                             // Node<value_type> *newNode = new Node<value_type>(data);
                             Node<value_type> *newNode = new Node<value_type>;
                             newNode->data = new value_type(data);
-                            size++;
                             newNode->parent = tmp;
                             tmp->left = newNode;  
                             CheckBalance(tmp);
@@ -325,7 +322,6 @@ namespace ft {
                             // allocator.construct(newNode);
                             tmp->right = newNode;
                             newNode->parent = tmp;
-                            size++;
                             CheckBalance(tmp);
                             return ;
                         }

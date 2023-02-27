@@ -6,7 +6,7 @@
 /*   By: sahafid <sahafid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/23 20:27:38 by sahafid           #+#    #+#             */
-/*   Updated: 2023/02/25 18:44:32 by sahafid          ###   ########.fr       */
+/*   Updated: 2023/02/26 14:13:01 by sahafid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ int main()
     // // it++;
 
 
-
     for (int i = 0; i < 30; i++)
     {
         y.insert(std::pair<int, int>(i, 3)); 
@@ -45,9 +44,11 @@ int main()
     // iter--;
     // y.insert(iter, y.end());
 
-    x.insert(y.begin(), y.end());
+    // x.insert(y.begin(), y.end());
     
     for (ft::map<int, int>::iterator it = x.begin(); it != x.end(); it++)
-        
-
+    {
+        std::cout << it->first << std::endl;
+    }
+    // x.printBTT();
 }
